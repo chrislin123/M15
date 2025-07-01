@@ -21,7 +21,7 @@ cnxn = pyodbc.connect(connstring)
 cursor = cnxn.cursor()
 
 
-
+#
 #Sample select query
 #20250509 新增判斷StationName <> 'False'，避免抓取資料內容預設值有異常
 # cursor.execute("SELECT  StationID, MapCH, Title, Unit, DataTime, RealVale, StationName, ParameterBP, ParameterR FROM StationReal WHERE StationName <> '' ORDER BY  StationID") 
