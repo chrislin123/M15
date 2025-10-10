@@ -1,3 +1,5 @@
 XML/
 SystemRecord/
+.vscode/
 test.py
+.env
