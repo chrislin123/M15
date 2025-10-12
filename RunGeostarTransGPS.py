@@ -13,12 +13,16 @@ import ProjectLib as ProjectLib
 from sqlalchemy.sql import text
 
 # from sqlalchemy.orm import session
-from db import dbinst, GeostarRaw, Result10MinData
+from db import dbinst, Result10MinData, GpsBasSetting
+
+
+from pprint import pprint
 
 
 # 每日解算(欄位8,9,10)
 def getDailyCal(cond):
-    StationID = f'RTK_{cond["StationID"]}'
+    # StationID = f'RTK_{cond["StationID"]}'
+    StationID = cond["StationID"]
     DatetimeQuery = cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")
 
     # 初始值
@@ -91,7 +95,8 @@ def getDailyCal(cond):
 
 
 def getDisplacementTotal(cond):
-    StationID = f'RTK_{cond["StationID"]}'
+    # StationID = f'RTK_{cond["StationID"]}'
+    StationID = cond["StationID"]
     DatetimeQuery = cond["RAWMaxDatetime"]
     MinDatetimeQuery = cond["RAWMaxDatetime"]
     # 初始值
@@ -162,7 +167,8 @@ def getDisplacementTotal(cond):
 
 
 def CalGps(cond):
-    StationID = f'RTK_{cond["StationID"]}'
+    # StationID = f'RTK_{cond["StationID"]}'
+    StationID = cond["StationID"]
     cond["RAWMaxDatetime"] = cond["DatetimeQuery"]
     geoResult = ""
     try:
@@ -348,6 +354,22 @@ def main():
     # 六龜三個-'LGN047-G1','LGN047-G2','LGN047-G3'
     # 山地門四個-?
     geoStation = ["LGN047-G1", "LGN047-G2", "LGN047-G3"]
+    try:
+        with dbinst.getsessionM15()() as session:
+
+            datas = (
+                session.query(GpsBasSetting)
+                .filter(GpsBasSetting.TableTrans_YN == "Y")
+                .all()
+            )
+
+            geoStation = [data.TableTrans_MapName for data in datas]
+            print(geoStation)
+
+    except Exception as e:
+        trace_back = sys.exc_info()[2]
+        line = trace_back.tb_lineno
+        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
     for station in geoStation:
         geoResult = ""

@@ -119,6 +119,19 @@ class Result10MinData(Base):
     CgiData = Column(Text)
 
 
+# GPS轉檔基本設定表
+class GpsBasSetting(Base):
+    __tablename__ = "GpsBasSetting"
+    no = Column(Integer, primary_key=True, autoincrement=True)
+    Site = Column(Text)
+    Station = Column(Text)
+    Sensor = Column(Text)
+    TableTrans_MapName = Column(Text)
+    TableTrans_YN = Column(Text)
+    RenderXML_YN = Column(Text)
+    Remark = Column(Text)
+
+
 class GeostarRaw(Base):
     __tablename__ = "GeostarRaw"
     no = Column(Integer, primary_key=True, autoincrement=True)
