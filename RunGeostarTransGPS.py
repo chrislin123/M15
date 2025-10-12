@@ -1,22 +1,12 @@
 import sys
 from datetime import datetime, timedelta
-
-# 資料庫相關
-# import pymssql
-from collections import deque
-
-from sqlalchemy import select
-import ProjectLib as ProjectLib
-
+from pprint import pprint
 
 # 資料庫連線相關及Orm.Model
 from sqlalchemy.sql import text
-
-# from sqlalchemy.orm import session
 from db import dbinst, Result10MinData, GpsBasSetting
 
-
-from pprint import pprint
+import ProjectLib as ProjectLib
 
 
 # 每日解算(欄位8,9,10)
@@ -59,7 +49,6 @@ def getDailyCal(cond):
 
             # 轉成 list of dict
             rows = [dict(row._mapping) for row in result]
-            # print(rows)
 
             for (
                 row
@@ -242,12 +231,6 @@ def CalGps(cond):
                     """
             )
 
-            # sql = text()
-            # result1 = session.execute(ssql,params)
-            # result1 = session.execute(ssql)
-            # ttt = result1.fetchone()
-            # print(result1)
-
             row = session.execute(sql, params).first()
 
             if row is not None:
@@ -288,7 +271,7 @@ def CalGps(cond):
 
 def insResult10MinData(cond):
     try:
-        # Cond = {"StationID":"Moten-4","DatetimeQuery" : "2025-01-05 00:00:00"}
+
         StationID = cond["StationID"]
         DatetimeQuery = cond["DatetimeQuery"].strftime("%Y-%m-%d %H:%M:%S")
         geoResult = cond["geoResult"]
@@ -353,7 +336,7 @@ def main():
 
     # 六龜三個-'LGN047-G1','LGN047-G2','LGN047-G3'
     # 山地門四個-?
-    geoStation = ["LGN047-G1", "LGN047-G2", "LGN047-G3"]
+    geoStation = []
     try:
         with dbinst.getsessionM15()() as session:
 
@@ -374,9 +357,6 @@ def main():
     for station in geoStation:
         geoResult = ""
         Cond = {"StationID": station, "DatetimeQuery": datetimenow}
-        # StationID = "Moten-4"
-        # DatetimeQuery = "2025-01-05 00:00:00"
-        # geoResult = ""
 
         # 取得GNSS十個欄位計算結果
         geoResult = CalGps(Cond)
