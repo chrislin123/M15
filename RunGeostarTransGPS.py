@@ -12,7 +12,7 @@ import ProjectLib as ProjectLib
 # 每日解算(欄位8,9,10)
 def getDailyCal(cond):
     # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationID"]
+    StationID = cond["StationData"]["TableTrans_MapName"]
     DatetimeQuery = cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")
 
     # 初始值
@@ -85,7 +85,7 @@ def getDailyCal(cond):
 
 def getDisplacementTotal(cond):
     # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationID"]
+    StationID = cond["StationData"]["TableTrans_MapName"]
     DatetimeQuery = cond["RAWMaxDatetime"]
     MinDatetimeQuery = cond["RAWMaxDatetime"]
     # 初始值
@@ -157,7 +157,7 @@ def getDisplacementTotal(cond):
 
 def CalGps(cond):
     # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationID"]
+    StationID = cond["StationData"]["TableTrans_MapName"]
     cond["RAWMaxDatetime"] = cond["DatetimeQuery"]
     geoResult = ""
     try:
@@ -272,7 +272,7 @@ def CalGps(cond):
 def insResult10MinData(cond):
     try:
 
-        StationID = cond["StationID"]
+        # StationID = cond["StationData"].Station
         DatetimeQuery = cond["DatetimeQuery"].strftime("%Y-%m-%d %H:%M:%S")
         geoResult = cond["geoResult"]
         with dbinst.getsessionM15()() as session:
@@ -280,7 +280,9 @@ def insResult10MinData(cond):
             Result10MinData1 = (
                 session.query(Result10MinData)
                 .filter(
-                    Result10MinData.SensorID == StationID,
+                    Result10MinData.SiteID == cond["StationData"]["Site"],
+                    Result10MinData.StationID == cond["StationData"]["Station"],
+                    Result10MinData.SensorID == cond["StationData"]["Sensor"],
                     Result10MinData.DatetimeString == DatetimeQuery,
                 )
                 .first()
@@ -288,9 +290,9 @@ def insResult10MinData(cond):
 
             if Result10MinData1 is None:
                 Result10MinData1 = Result10MinData()
-                Result10MinData1.SiteID = StationID
-                Result10MinData1.StationID = StationID
-                Result10MinData1.SensorID = StationID
+                Result10MinData1.SiteID = cond["StationData"]["Site"]
+                Result10MinData1.StationID = cond["StationData"]["Station"]
+                Result10MinData1.SensorID = cond["StationData"]["Sensor"]
                 Result10MinData1.DataType = "GPSForecast3db"
                 Result10MinData1.DataName = "GPSForecast3db"
                 Result10MinData1.Datetime = DatetimeQuery
@@ -336,7 +338,7 @@ def main():
 
     # 六龜三個-'LGN047-G1','LGN047-G2','LGN047-G3'
     # 山地門四個-?
-    geoStation = []
+    geoStations = []
     try:
         with dbinst.getsessionM15()() as session:
 
@@ -346,17 +348,26 @@ def main():
                 .all()
             )
 
-            geoStation = [data.TableTrans_MapName for data in datas]
-            print(geoStation)
+            for data in datas:
+                Station = {
+                    "Site": data.Site,
+                    "Station": data.Station,
+                    "Sensor": data.Sensor,
+                    "TableTrans_MapName": data.TableTrans_MapName,
+                }
+                geoStations.append(Station)
+
+            # geoStations = [data.TableTrans_MapName for data in datas]
+            print(geoStations)
 
     except Exception as e:
         trace_back = sys.exc_info()[2]
         line = trace_back.tb_lineno
         print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
-    for station in geoStation:
+    for station in geoStations:
         geoResult = ""
-        Cond = {"StationID": station, "DatetimeQuery": datetimenow}
+        Cond = {"StationData": station, "DatetimeQuery": datetimenow}
 
         # 取得GNSS十個欄位計算結果
         geoResult = CalGps(Cond)
@@ -366,7 +377,9 @@ def main():
         # 寫入記錄檔
         insResult10MinData(Cond)
 
-        print(f"站點[{station}]-{datetimenow}-轉檔完成")
+        print(
+            f"站點[{station["TableTrans_MapName"]}=>{station["Sensor"]}]-{datetimenow}-轉檔完成"
+        )
 
 
 # 直接執行這個模組，它會判斷為 true

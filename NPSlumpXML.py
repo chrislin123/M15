@@ -10,16 +10,16 @@ from sqlalchemy.sql import text
 # from sqlalchemy.orm import session
 from db import dbinst, Result10MinData
 
+from ProjectLib import getenv
+
 # using now() to get current time
 now = datetime.now()
 
 # Some other example server values are
-# server = 'localhost\sqlexpress' # for a named instance
-# server = 'DESKTOP-5CGSQOL\SQLEXPRESS'  # to specify an alternate port
-server = "BV550234820001\SQLEXPRESS"
-database = "Procal"
-username = "npust"
-password = "swcb@npust2024!"
+server = getenv("DataBaseIP")
+database = getenv("DataBaseNameProcal")
+username = getenv("DataBaseAccountProcal")
+password = getenv("DataBasePassWordProcal")
 # ENCRYPT defaults to yes starting in ODBC Driver 17. It's good to always specify ENCRYPT=yes on the client side to avoid MITM attacks.
 # connstring='DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password
 connstring = (
@@ -243,7 +243,7 @@ try:
                     if data.SensorID == SName:
                         node.text = data.value
                         node.set("time", s)
-                print(data.SiteID)
+                print(data.SensorID)
 
 
 except Exception as e:
