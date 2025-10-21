@@ -247,7 +247,9 @@ def TransToResult10MinData():
                             )
                             Result10MinDataEM.sensor_status = "0"
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = ""
+                            Result10MinDataEM.remark = (
+                                f"資料來源時間：{SensorDatatime.DataTime}"
+                            )
                             Result10MinDataEM.CgiData = ""
 
                             session.add(Result10MinDataEM)
@@ -256,6 +258,9 @@ def TransToResult10MinData():
                             # 更新資料
                             Result10MinDataEM.GetTime = ProjectLib.getNowDatetime()
                             Result10MinDataEM.value = resultValue
+                            Result10MinDataEM.remark = (
+                                f"資料來源時間：{SensorDatatime.DataTime}"
+                            )
                             session.commit()
 
                         print(
@@ -349,7 +354,9 @@ def TransToResult10MinData():
                             )
                             Result10MinDataEM.sensor_status = "0"
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = ""
+                            Result10MinDataEM.remark = (
+                                f"資料來源時間：{SensorDatatime.DataTime}"
+                            )
                             Result10MinDataEM.CgiData = ""
 
                             session.add(Result10MinDataEM)
@@ -358,6 +365,9 @@ def TransToResult10MinData():
                             # 更新資料
                             Result10MinDataEM.GetTime = ProjectLib.getNowDatetime()
                             Result10MinDataEM.value = resultValue
+                            Result10MinDataEM.remark = (
+                                f"資料來源時間：{SensorDatatime.DataTime}"
+                            )
                             session.commit()
 
                         print(
