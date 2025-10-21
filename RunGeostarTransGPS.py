@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pprint import pprint
 
 # 資料庫連線相關及Orm.Model
@@ -318,22 +318,10 @@ def insResult10MinData(cond):
         print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
 
-# 取得下一個十分鐘
-def get_next_closest_ten_minutes(datetimenow: datetime):
-    # now = datetime.datetime.now()
-    now = datetimenow
-    current_minute = now.minute
-    ten_minutes_tick = (current_minute // 10) * 10
-    closest_ten_minutes = now.replace(minute=ten_minutes_tick, second=0, microsecond=0)
-    closest_ten_minutes = closest_ten_minutes + timedelta(minutes=10)
-
-    return closest_ten_minutes
-
-
 def main():
 
     # 取得程式執行時間下一個十分鐘
-    datetimenow = get_next_closest_ten_minutes(datetime.now())
+    datetimenow = ProjectLib.get_next_closest_ten_minutes(datetime.now())
     # print(f"最接近的十分钟: {datetimenow}")
 
     # 六龜三個-'LGN047-G1','LGN047-G2','LGN047-G3'

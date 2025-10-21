@@ -9,7 +9,7 @@ from urllib.parse import quote_plus
 # 資料庫相關sqlalchemy
 import sqlalchemy
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, Text, DateTime
+from sqlalchemy import Table, Column, Integer, String, MetaData, Text, DateTime, DECIMAL
 from sqlalchemy import select, insert
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from sqlalchemy.sql import text
@@ -130,6 +130,9 @@ class GpsBasSetting(Base):
     TableTrans_YN = Column(Text)
     RenderXML_YN = Column(Text)
     Remark = Column(Text)
+    SensorType = Column(Text)
+    SensorTypeSim = Column(Text)
+    observation_num = Column(Text)
 
 
 class GeostarRaw(Base):
@@ -150,3 +153,22 @@ class GeostarRaw(Base):
     Delta_N = Column(Text)
     Delta_H = Column(Text)
     AzimuthAngle = Column(Text)
+
+
+class M15StationData(Base):
+    __tablename__ = "M15StationData"
+    no = Column(Integer, primary_key=True, autoincrement=True)
+    RawID = Column(Text)
+    DataTime = Column(DateTime)
+    FileName = Column(Text)
+    CH1 = Column(DECIMAL)
+    CH2 = Column(DECIMAL)
+    CH3 = Column(DECIMAL)
+    CH4 = Column(DECIMAL)
+    CH5 = Column(DECIMAL)
+    CH6 = Column(DECIMAL)
+    CH7 = Column(DECIMAL)
+    CH8 = Column(DECIMAL)
+    CH9 = Column(DECIMAL)
+    CH10 = Column(DECIMAL)
+    GetTime = Column(Text)

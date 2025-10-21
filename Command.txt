@@ -1,0 +1,56 @@
+
+将Python程序部署到服务器可以按照以下步骤进行操作：
+步骤一：连接服务器
+首先，需要通过SSH（Secure Shell）协议连接到服务器。可以使用终端或者SSH客户端工具来连接服务器。具体的步骤可以参考服务器提供商的文档或者教程，输入服务器IP地址和登录凭据，成功连接到服务器。
+
+步骤二：安装Python环境
+一旦连接到服务器，需要确保服务器上已经安装了Python环境。可以通过以下命令检查Python版本：
+
+python --version
+如果没有安装Python或者版本太低，可以通过以下命令安装Python：
+
+sudo apt-get install python3
+这个命令将会安装Python 3版本。你也可以使用其他适用的命令根据你的需求进行安装。
+
+步骤三：上传代码
+一旦确认Python环境已经安装完毕，下一步就是将代码上传到服务器。可以使用SCP（Secure Copy）命令或者FTP（File Transfer Protocol）工具将代码从本地上传到服务器。具体步骤可以参考SCP或者FTP工具的文档或者教程。
+
+步骤四：安装依赖
+如果Python程序使用了第三方库或者依赖，需要在服务器上安装这些依赖。可以使用pip（Python包管理器）命令来安装依赖，例如：
+
+pip install package_name
+其中package_name是你需要安装的包名称。你可以将所有的依赖项列在一个requirements.txt文件中，然后使用以下命令安装所有依赖项：
+
+pip install -r requirements.txt
+步骤五：运行程序
+一旦所有依赖项都安装完毕，就可以在服务器上运行Python程序了。可以使用以下命令来运行程序：
+
+python your_program.py
+其中your_program.py是你的Python程序的文件名。
+
+步骤六：保持程序运行
+如果你希望程序在服务器上持续运行，可以使用一些工具来实现。例如，可以使用nohup命令，将程序置于后台运行：
+
+nohup python your_program.py > output.log &
+其中your_program.py是你的Python程序的文件名，output.log是输出日志的文件名。这样程序将会在后台运行，并将输出信息写入output.log文件中。
+
+步骤七：监控和维护
+一旦程序在服务器上运行，你可能需要对程序进行监控和维护。可以使用一些工具来监控程序的运行状态，例如supervisor或者systemd。这些工具可以帮助你自动重启程序，确保程序在意外崩溃时能够重新启动。
+
+
+
+
+
+================================================================
+#目前專案使用的類別庫，產生requirements.txt
+pip freeze > requirements.txt
+
+#依照 requirements.txt 安裝類別庫
+pip install -r requirements.txt
+
+
+================================================================
+Python爬蟲常識
+https://hackmd.io/@aaronlife/python-topic-crawler-knowledge?utm_source=preview-mode&utm_medium=rec
+
+
