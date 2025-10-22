@@ -376,6 +376,10 @@ def TransToResult10MinData():
 # 從另一個模組匯入這個模組，它會判斷為 false
 if __name__ == "__main__":
     # 下載資料同步到資料庫
-    DownloadToDB()
+    try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
+        DownloadToDB()
+    except Exception as e:
+        pass
+
     # 轉檔至Result10MinData
     TransToResult10MinData()
