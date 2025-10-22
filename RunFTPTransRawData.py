@@ -247,9 +247,7 @@ def TransToResult10MinData():
                             )
                             Result10MinDataEM.sensor_status = "0"
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = (
-                                f"資料來源時間：{SensorDatatime.DataTime}"
-                            )
+                            Result10MinDataEM.remark = f"設備編號：{GpsBasSettingRow.TableTrans_MapName} 來源時間：{SensorDatatime.DataTime}"
                             Result10MinDataEM.CgiData = ""
 
                             session.add(Result10MinDataEM)
@@ -258,13 +256,11 @@ def TransToResult10MinData():
                             # 更新資料
                             Result10MinDataEM.GetTime = ProjectLib.getNowDatetime()
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = (
-                                f"資料來源時間：{SensorDatatime.DataTime}"
-                            )
+                            Result10MinDataEM.remark = f"設備編號：{GpsBasSettingRow.TableTrans_MapName} 來源時間：{SensorDatatime.DataTime}"
                             session.commit()
 
                         print(
-                            f"[Result10MinData]ID:{GpsBasSettingRow.Sensor}-時間{datetimenow}-資料{resultValue}-轉檔完成"
+                            f"[Result10MinData]ID:{GpsBasSettingRow.Sensor}[{GpsBasSettingRow.SensorTypeSim}]-時間{datetimenow}-資料{resultValue}-轉檔完成"
                         )
 
                 # 地表傾斜計(雙軸)
@@ -354,9 +350,7 @@ def TransToResult10MinData():
                             )
                             Result10MinDataEM.sensor_status = "0"
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = (
-                                f"資料來源時間：{SensorDatatime.DataTime}"
-                            )
+                            Result10MinDataEM.remark = f"設備編號：{GpsBasSettingRow.TableTrans_MapName} 來源時間：{SensorDatatime.DataTime}"
                             Result10MinDataEM.CgiData = ""
 
                             session.add(Result10MinDataEM)
@@ -365,13 +359,11 @@ def TransToResult10MinData():
                             # 更新資料
                             Result10MinDataEM.GetTime = ProjectLib.getNowDatetime()
                             Result10MinDataEM.value = resultValue
-                            Result10MinDataEM.remark = (
-                                f"資料來源時間：{SensorDatatime.DataTime}"
-                            )
+                            Result10MinDataEM.remark = f"設備編號：{GpsBasSettingRow.TableTrans_MapName} 來源時間：{SensorDatatime.DataTime}"
                             session.commit()
 
                         print(
-                            f"[Result10MinData]ID:{GpsBasSettingRow.Sensor}-時間{datetimenow}-資料{resultValue}-轉檔完成"
+                            f"[Result10MinData]ID:{GpsBasSettingRow.Sensor}[{GpsBasSettingRow.SensorTypeSim}]-時間{datetimenow}-資料{resultValue}-轉檔完成"
                         )
 
     except Exception as e:

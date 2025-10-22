@@ -10,9 +10,9 @@ import ProjectLib as ProjectLib
 
 
 # 每日解算(欄位8,9,10)
-def getDailyCal(cond):
+def getDailyCal(cond, station: GpsBasSetting):
     # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationData"]["TableTrans_MapName"]
+    StationID = station.TableTrans_MapName
     DatetimeQuery = cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")
 
     # 初始值
@@ -83,9 +83,9 @@ def getDailyCal(cond):
         return DailyCal
 
 
-def getDisplacementTotal(cond):
+def getDisplacementTotal(cond, station: GpsBasSetting):
     # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationData"]["TableTrans_MapName"]
+    StationID = station.TableTrans_MapName
     DatetimeQuery = cond["RAWMaxDatetime"]
     MinDatetimeQuery = cond["RAWMaxDatetime"]
     # 初始值
@@ -155,9 +155,9 @@ def getDisplacementTotal(cond):
         return DisplacementTotal
 
 
-def CalGps(cond):
-    # StationID = f'RTK_{cond["StationID"]}'
-    StationID = cond["StationData"]["TableTrans_MapName"]
+def CalGps(cond, station: GpsBasSetting):
+
+    StationID = station.TableTrans_MapName
     cond["RAWMaxDatetime"] = cond["DatetimeQuery"]
     geoResult = ""
     try:
@@ -249,10 +249,10 @@ def CalGps(cond):
                 # 累積變位量
                 # 屏科-顏志憲LINE訊息，計算方式
                 # 欄位7，當下時間的三軸變位量-初始值(監測第一筆資料)的三軸變位量
-                DisplacementTotal = getDisplacementTotal(cond)
+                DisplacementTotal = getDisplacementTotal(cond, station)
 
                 # 每日解算後ENH值
-                DailyCal = getDailyCal(cond)
+                DailyCal = getDailyCal(cond, station)
                 DailyCal_E = DailyCal["DailyCal_E"]
                 DailyCal_N = DailyCal["DailyCal_N"]
                 DailyCal_H = DailyCal["DailyCal_H"]
@@ -269,10 +269,9 @@ def CalGps(cond):
         print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
 
-def insResult10MinData(cond):
+def insResult10MinData(cond, station: GpsBasSetting):
     try:
 
-        # StationID = cond["StationData"].Station
         DatetimeQuery = cond["DatetimeQuery"].strftime("%Y-%m-%d %H:%M:%S")
         geoResult = cond["geoResult"]
         with dbinst.getsessionM15()() as session:
@@ -280,9 +279,9 @@ def insResult10MinData(cond):
             Result10MinData1 = (
                 session.query(Result10MinData)
                 .filter(
-                    Result10MinData.SiteID == cond["StationData"]["Site"],
-                    Result10MinData.StationID == cond["StationData"]["Station"],
-                    Result10MinData.SensorID == cond["StationData"]["Sensor"],
+                    Result10MinData.SiteID == station.Site,
+                    Result10MinData.StationID == station.Station,
+                    Result10MinData.SensorID == station.Sensor,
                     Result10MinData.DatetimeString == DatetimeQuery,
                 )
                 .first()
@@ -290,18 +289,18 @@ def insResult10MinData(cond):
 
             if Result10MinData1 is None:
                 Result10MinData1 = Result10MinData()
-                Result10MinData1.SiteID = cond["StationData"]["Site"]
-                Result10MinData1.StationID = cond["StationData"]["Station"]
-                Result10MinData1.SensorID = cond["StationData"]["Sensor"]
-                Result10MinData1.DataType = "GPSForecast3db"
-                Result10MinData1.DataName = "GPSForecast3db"
+                Result10MinData1.SiteID = station.Site
+                Result10MinData1.StationID = station.Station
+                Result10MinData1.SensorID = station.Sensor
+                Result10MinData1.DataType = station.SensorType
+                Result10MinData1.DataName = station.SensorTypeSim
                 Result10MinData1.Datetime = DatetimeQuery
                 Result10MinData1.DatetimeString = DatetimeQuery
                 Result10MinData1.GetTime = ProjectLib.getNowDatetime()
-                Result10MinData1.observation_num = "10"
+                Result10MinData1.observation_num = station.observation_num
                 Result10MinData1.sensor_status = "0"
                 Result10MinData1.value = geoResult
-                Result10MinData1.remark = ""
+                Result10MinData1.remark = f'設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
                 Result10MinData1.CgiData = ""
 
                 session.add(Result10MinData1)
@@ -310,6 +309,7 @@ def insResult10MinData(cond):
                 # 更新資料
                 Result10MinData1.GetTime = ProjectLib.getNowDatetime()
                 Result10MinData1.value = geoResult
+                Result10MinData1.remark = f'設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
                 session.commit()
 
     except Exception as e:
@@ -326,26 +326,29 @@ def main():
 
     # 六龜三個-'LGN047-G1','LGN047-G2','LGN047-G3'
     # 山地門四個-?
-    geoStations = []
+    geoStations = None
     try:
         with dbinst.getsessionM15()() as session:
 
-            datas = (
+            geoStations = (
                 session.query(GpsBasSetting)
-                .filter(GpsBasSetting.TableTrans_YN == "Y")
+                .filter(
+                    GpsBasSetting.TableTrans_YN == "Y",
+                    GpsBasSetting.SensorType == "GPSForecast3db",
+                )
                 .all()
             )
 
-            for data in datas:
-                Station = {
-                    "Site": data.Site,
-                    "Station": data.Station,
-                    "Sensor": data.Sensor,
-                    "TableTrans_MapName": data.TableTrans_MapName,
-                }
-                geoStations.append(Station)
+            # for data in datas:
+            #     Station = {
+            #         "Site": data.Site,
+            #         "Station": data.Station,
+            #         "Sensor": data.Sensor,
+            #         "TableTrans_MapName": data.TableTrans_MapName,
+            #     }
+            #     geoStations.append(Station)
 
-            # geoStations = [data.TableTrans_MapName for data in datas]
+            # geoStations = [data for data in datas]
             print(geoStations)
 
     except Exception as e:
@@ -355,18 +358,18 @@ def main():
 
     for station in geoStations:
         geoResult = ""
-        Cond = {"StationData": station, "DatetimeQuery": datetimenow}
+        Cond = {"DatetimeQuery": datetimenow}
 
         # 取得GNSS十個欄位計算結果
-        geoResult = CalGps(Cond)
+        geoResult = CalGps(Cond, station)
 
         Cond["geoResult"] = geoResult
 
         # 寫入記錄檔
-        insResult10MinData(Cond)
+        insResult10MinData(Cond, station)
 
         print(
-            f"站點[{station["TableTrans_MapName"]}=>{station["Sensor"]}]-{datetimenow}-轉檔完成"
+            f"站點[{station.TableTrans_MapName}=>{station.Sensor}]-{datetimenow}-轉檔完成"
         )
 
 

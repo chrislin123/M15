@@ -224,11 +224,12 @@ try:
         if maxresult is not None:
             maxdatetimestring = maxresult.maxdatetimestring
 
+        SensorType_to_find = ["GPSForecast3db", "BiTiltMeter", "ExtensoMeter"]
         Result10MinData1 = (
             session.query(Result10MinData)
             .filter(
                 Result10MinData.DatetimeString == maxdatetimestring,
-                Result10MinData.DataType == "GPSForecast3db",
+                Result10MinData.DataType.in_(SensorType_to_find),
             )
             .all()
         )
