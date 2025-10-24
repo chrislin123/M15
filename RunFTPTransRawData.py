@@ -157,7 +157,7 @@ def DownloadToDB():
 def TransToResult10MinData():
     try:
         with dbinst.getsessionM15()() as session:
-
+            #
             # 目前設定轉檔TM、EM
             SensorTypeSim_to_find = ["TM", "EM"]
             GpsBasSettings = (
