@@ -5,6 +5,7 @@ import xml.etree.ElementTree as XET
 from datetime import datetime, timedelta
 
 # 資料庫連線相關及Orm.Model
+from sqlalchemy import select
 from sqlalchemy.sql import text
 
 # from sqlalchemy.orm import session
@@ -224,15 +225,30 @@ try:
         if maxresult is not None:
             maxdatetimestring = maxresult.maxdatetimestring
 
+        # SensorType_to_find = ["GPSForecast3db", "BiTiltMeter", "ExtensoMeter"]
+        # Result10MinData1 = (
+        #     session.query(Result10MinData)
+        #     .filter(
+        #         Result10MinData.DatetimeString == maxdatetimestring,
+        #         Result10MinData.DataType.in_(SensorType_to_find),
+        #     )
+        #     .all()
+        # )
+
+        # 20260224 改用2.0語句
+        # 定義要尋找的感測器類型
         SensorType_to_find = ["GPSForecast3db", "BiTiltMeter", "ExtensoMeter"]
-        Result10MinData1 = (
-            session.query(Result10MinData)
-            .filter(
-                Result10MinData.DatetimeString == maxdatetimestring,
-                Result10MinData.DataType.in_(SensorType_to_find),
-            )
-            .all()
+
+        # 1. 建立 select 語句
+        # 在 2.0 中，filter 建議改用 where (雖然 filter 仍可用，但 where 是標準)
+        stmt = select(Result10MinData).where(
+            Result10MinData.DatetimeString == maxdatetimestring,
+            Result10MinData.DataType.in_(SensorType_to_find),
         )
+
+        # 2. 執行查詢並取得結果
+        # .scalars() 會將結果從 Row 物件轉回 Model 物件，.all() 取得清單
+        Result10MinData1 = session.execute(stmt).scalars().all()
 
         if Result10MinData1 is not None:
             # 取得所有GPS資料
