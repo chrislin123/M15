@@ -59,9 +59,9 @@ def main():
 
                 # 20260224 改用2.0語句
                 # 定義要尋找的感測器類型
-                # SensorType_to_find = ["GPSForecast3db", "BiTiltMeter", "ExtensoMeter"]
+                SensorType_to_find = ["GPSForecast3db", "BiTiltMeter", "ExtensoMeter"]
                 # 先更新 GPSForecast3db
-                SensorType_to_find = ["GPSForecast3db"]
+                # SensorType_to_find = ["GPSForecast3db"]
 
                 # 1. 建立 select 語句
                 # 在 2.0 中，filter 建議改用 where (雖然 filter 仍可用，但 where 是標準)
