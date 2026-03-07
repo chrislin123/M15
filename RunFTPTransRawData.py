@@ -87,33 +87,35 @@ def DownloadToDB():
     )
 
     for SourceBase in SourceBases:
-
-        # 取得CSV檔案 by web
-        url = SourceBase["url"]
-        s = requests.get(url).content
-        c = pd.read_csv(io.StringIO(s.decode(enc)), skiprows=header_row, dtype=str)
-
-        SourceDatas = []
-        for index, row in c.iterrows():
-            try:
-                Sourcedata = M15StationData()
-                Sourcedata.RawID = SourceBase["stationid"]
-                Sourcedata.DataTime = datetime.strptime(row.iloc[0], format_string)
-                Sourcedata.FileName = SourceBase["filename"]
-                Sourcedata.CH1 = row.iloc[2]
-                Sourcedata.CH2 = row.iloc[3]
-                Sourcedata.CH3 = row.iloc[4]
-                Sourcedata.CH4 = row.iloc[5]
-                Sourcedata.GetTime = ProjectLib.getNowDatetime()
-                SourceDatas.append(Sourcedata)
-            except (ValueError, TypeError):
-                # 如果發生時間轉換錯誤 (ValueError) 或資料本身是 None (TypeError)
-                # 則直接跳過此筆紀錄 (continue)
-                print(
-                    f"警告：[{SourceBase["stationid"]}]索引 {index}時間資料({row.iloc[0]}) 的時間格式錯誤，已跳過該筆資料。"
-                )
-                continue
         try:
+            # 取得CSV檔案 by web
+            url = SourceBase["url"]
+            s = requests.get(url).content
+            c = pd.read_csv(io.StringIO(s.decode(enc)), skiprows=header_row, dtype=str)
+
+            SourceDatas = []
+            for index, row in c.iterrows():
+                try:
+                    Sourcedata = M15StationData()
+                    Sourcedata.RawID = SourceBase["stationid"]
+                    Sourcedata.DataTime = datetime.strptime(row.iloc[0], format_string)
+                    Sourcedata.FileName = SourceBase["filename"]
+                    Sourcedata.CH1 = row.iloc[2]
+                    Sourcedata.CH2 = row.iloc[3]
+                    Sourcedata.CH3 = row.iloc[4]
+                    Sourcedata.CH4 = row.iloc[5]
+                    Sourcedata.GetTime = ProjectLib.getNowDatetime()
+                    SourceDatas.append(Sourcedata)
+                except (ValueError, TypeError):
+                    # 如果發生時間轉換錯誤 (ValueError) 或資料本身是 None (TypeError)
+                    # 則直接跳過此筆紀錄 (continue)
+                    print(
+                        "警告：[{0}]索引 {1}時間資料({2}) 的時間格式錯誤，已跳過該筆資料。".format(
+                            SourceBase["stationid"], index, row.iloc[0]
+                        )
+                    )
+                    continue
+
             with dbinst.getsessionM15()() as session:
 
                 # 取得最新資料時間
@@ -159,6 +161,7 @@ def DownloadToDB():
             trace_back = sys.exc_info()[2]
             line = trace_back.tb_lineno
             print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+            continue
 
 
 def TransToResult10MinData():
@@ -387,7 +390,12 @@ if __name__ == "__main__":
         DownloadToDB()
     except Exception as e:
         # 預計要新增logger及mail寄送
-        pass
+        trace_back = sys.exc_info()[2]
+        line = trace_back.tb_lineno
+        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
+    # DownloadToDB()
+
+    # 照理說要把轉檔XML改到另一隻程式
     # 轉檔至Result10MinData
     TransToResult10MinData()
