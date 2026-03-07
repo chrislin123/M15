@@ -95,17 +95,24 @@ def DownloadToDB():
 
         SourceDatas = []
         for index, row in c.iterrows():
-            Sourcedata = M15StationData()
-            Sourcedata.RawID = SourceBase["stationid"]
-            Sourcedata.DataTime = datetime.strptime(row.iloc[0], format_string)
-            Sourcedata.FileName = SourceBase["filename"]
-            Sourcedata.CH1 = row.iloc[2]
-            Sourcedata.CH2 = row.iloc[3]
-            Sourcedata.CH3 = row.iloc[4]
-            Sourcedata.CH4 = row.iloc[5]
-            Sourcedata.GetTime = ProjectLib.getNowDatetime()
-            SourceDatas.append(Sourcedata)
-
+            try:
+                Sourcedata = M15StationData()
+                Sourcedata.RawID = SourceBase["stationid"]
+                Sourcedata.DataTime = datetime.strptime(row.iloc[0], format_string)
+                Sourcedata.FileName = SourceBase["filename"]
+                Sourcedata.CH1 = row.iloc[2]
+                Sourcedata.CH2 = row.iloc[3]
+                Sourcedata.CH3 = row.iloc[4]
+                Sourcedata.CH4 = row.iloc[5]
+                Sourcedata.GetTime = ProjectLib.getNowDatetime()
+                SourceDatas.append(Sourcedata)
+            except (ValueError, TypeError):
+                # 如果發生時間轉換錯誤 (ValueError) 或資料本身是 None (TypeError)
+                # 則直接跳過此筆紀錄 (continue)
+                print(
+                    f"警告：[{SourceBase["stationid"]}]索引 {index}時間資料({row.iloc[0]}) 的時間格式錯誤，已跳過該筆資料。"
+                )
+                continue
         try:
             with dbinst.getsessionM15()() as session:
 
@@ -379,6 +386,7 @@ if __name__ == "__main__":
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         DownloadToDB()
     except Exception as e:
+        # 預計要新增logger及mail寄送
         pass
 
     # 轉檔至Result10MinData
