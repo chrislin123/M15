@@ -2,5 +2,8 @@ __pycache__/
 XML/
 SystemRecord/
 .vscode/
-test.py
 .env
+# 因應 Pyarmor 無法包裝.env檔，某些個人用的機敏資料改用config.py替代，但是不發步到Github上
+config.py
+# Pyarmor產生資料夾
+dist/
