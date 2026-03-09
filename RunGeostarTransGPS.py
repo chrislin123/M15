@@ -8,6 +8,12 @@ from db import dbinst, Result10MinData, GpsBasSetting
 
 import ProjectLib as ProjectLib
 
+# Logger
+from logger import WriteLogTxt
+
+log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj.setup_logger()
+
 
 # 每日解算(欄位8,9,10)
 def getDailyCal(cond, station: GpsBasSetting):
@@ -77,9 +83,7 @@ def getDailyCal(cond, station: GpsBasSetting):
 
         return DailyCal
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+        log_obj.write_log_exception("發生異常：{0}".format(e))
         return DailyCal
 
 
@@ -149,9 +153,7 @@ def getDisplacementTotal(cond, station: GpsBasSetting):
 
         return DisplacementTotal
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+        log_obj.write_log_exception("發生異常：{0}".format(e))
         return DisplacementTotal
 
 
@@ -264,9 +266,7 @@ def CalGps(cond, station: GpsBasSetting):
 
         return geoResult
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+        log_obj.write_log_exception("發生異常：{0}".format(e))
 
 
 def insResult10MinData(cond, station: GpsBasSetting):
@@ -313,9 +313,7 @@ def insResult10MinData(cond, station: GpsBasSetting):
                 session.commit()
 
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+        log_obj.write_log_exception("發生異常：{0}".format(e))
 
 
 def main():
@@ -352,9 +350,7 @@ def main():
             print(geoStations)
 
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+        log_obj.write_log_exception("發生異常：{0}".format(e))
 
     for station in geoStations:
         geoResult = ""

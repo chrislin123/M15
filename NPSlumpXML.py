@@ -13,6 +13,14 @@ from db import dbinst, Result10MinData
 
 from ProjectLib import getenv
 
+import ProjectLib as ProjectLib
+
+# Logger
+from logger import WriteLogTxt
+
+log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj.setup_logger()
+
 # using now() to get current time
 now = datetime.now()
 
@@ -264,9 +272,7 @@ try:
 
 
 except Exception as e:
-    trace_back = sys.exc_info()[2]
-    line = trace_back.tb_lineno
-    print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+    log_obj.write_log_exception("發生異常：{0}".format(e))
 
 
 tree.write(amPath + XM10MinFile, encoding="UTF-8")

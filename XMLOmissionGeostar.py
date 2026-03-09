@@ -10,6 +10,13 @@ from sqlalchemy.sql import text
 
 # from sqlalchemy.orm import session
 from db import dbinst, Result10MinData
+import ProjectLib
+
+# Logger
+from logger import WriteLogTxt
+
+log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj.setup_logger()
 
 
 def main():
@@ -52,6 +59,7 @@ def main():
 
         except Exception as e:
             print(f"解析失敗 {file_path.name}: {e}")
+            log_obj.write_log_exception("發生異常：{0}".format(e))
 
         # GPS更新10MinXML
         try:
@@ -90,9 +98,7 @@ def main():
                                 print(f"{data.SensorID}-更新")
 
         except Exception as e:
-            trace_back = sys.exc_info()[2]
-            line = trace_back.tb_lineno
-            print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+            log_obj.write_log_exception("發生異常：{0}".format(e))
 
         # 儲存XML
         tree.write(file_path, encoding="UTF-8")
