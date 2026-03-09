@@ -11,6 +11,11 @@ from sqlalchemy.sql import text
 from db import dbinst, Result10MinData, GpsBasSetting, M15StationData
 
 import ProjectLib as ProjectLib
+from logger import WriteLogTxt
+
+#
+log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj.setup_logger()
 
 
 def DownloadToDB():
@@ -114,6 +119,13 @@ def DownloadToDB():
                             SourceBase["stationid"], index, row.iloc[0]
                         )
                     )
+
+                    log_obj.write_log_exception(
+                        "警告：[{0}]索引 {1}時間資料({2}) 的時間格式錯誤，已跳過該筆資料。發生異常：{3}".format(
+                            SourceBase["stationid"], index, row.iloc[0], e
+                        )
+                    )
+
                     continue
 
             with dbinst.getsessionM15()() as session:
@@ -158,9 +170,7 @@ def DownloadToDB():
                         )
 
         except Exception as e:
-            trace_back = sys.exc_info()[2]
-            line = trace_back.tb_lineno
-            print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
+            log_obj.write_log_exception("發生異常：{0}".format(e))
             continue
 
 
@@ -377,24 +387,19 @@ def TransToResult10MinData():
                         )
 
     except Exception as e:
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
+        log_obj.write_log_exception("發生異常：{0}".format(e))
         print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
 
 
 # 直接執行這個模組，它會判斷為 true
 # 從另一個模組匯入這個模組，它會判斷為 false
 if __name__ == "__main__":
+
     # 下載資料同步到資料庫
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         DownloadToDB()
     except Exception as e:
-        # 預計要新增logger及mail寄送
-        trace_back = sys.exc_info()[2]
-        line = trace_back.tb_lineno
-        print("{0}，Error Line:{1}".format(f"Encounter exception: {e}"), line)
-
-    # DownloadToDB()
+        log_obj.write_log_exception(f"執行 DownloadToDB 發生異常：{e}")
 
     # 照理說要把轉檔XML改到另一隻程式
     # 轉檔至Result10MinData

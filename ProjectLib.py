@@ -3,6 +3,11 @@ from datetime import datetime, timedelta
 
 # 讀取機敏設定檔
 from dotenv import get_key, load_dotenv
+import config
+
+# ProjectInfo 暫時先放這邊
+ProjectID = "M15"
+ProjectName = "屏科大_大崩計畫"
 
 
 def getenv(getenv):
@@ -42,3 +47,18 @@ def get_next_closest_ten_minutes(datetimenow: datetime):
     closest_ten_minutes = closest_ten_minutes + timedelta(minutes=10)
 
     return closest_ten_minutes
+
+
+def getLoggerMailSetting():
+    MailSetting = {
+        "mail_host": ("smtp.gmail.com", 587),
+        "from_addr": config.MAIL_SETTINGS["SMTP_USER"],
+        "to_addrs": config.MAIL_SETTINGS["MAILTO"],
+        "subject": "[{0}]({1})系統錯誤通報".format(ProjectID, ProjectName),
+        "credentials": (
+            config.MAIL_SETTINGS["SMTP_USER"],
+            config.MAIL_SETTINGS["SMTP_PASSWORD"],
+        ),  # 需使用應用程式密碼
+    }
+
+    return MailSetting
