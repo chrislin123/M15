@@ -2,6 +2,10 @@
 #加密整個資料夾 (Recursive)
 pyarmor gen .
 
+#Pyarmor加密 跳過 dist 資料夾
+pyarmor gen --exclude dist .
+
+
 #加密整個資料夾 (Recursive)--包含搬移.env檔案
 todo
 
