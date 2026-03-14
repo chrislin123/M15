@@ -49,6 +49,7 @@ def get_next_closest_ten_minutes(datetimenow: datetime):
     return closest_ten_minutes
 
 
+# 取得該專案Logger寄送mail的設定檔
 def getLoggerMailSetting():
     MailSetting = {
         "mail_host": ("smtp.gmail.com", 587),

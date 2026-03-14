@@ -35,11 +35,14 @@ class WriteLogTxt:
         self._initialized = True  # 標記為已初始化
 
     def setup_logger(self):
+        # 取得目前這個檔案 (logger.py) 所在的絕對路徑，或是執行檔路徑
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
         # 2. 簡化路徑邏輯：集中在同一目錄以利 backupCount 清理
         if not self.file_path:
-            log_folder = os.path.join(os.getcwd(), "Logs")
+            log_folder = os.path.join(base_dir, "Logs")
         elif self.file_path.startswith("\\") or self.file_path.startswith("/"):
-            log_folder = os.path.join(os.getcwd(), self.file_path.lstrip("\\/"))
+            log_folder = os.path.join(base_dir, self.file_path.lstrip("\\/"))
         else:
             log_folder = self.file_path
 

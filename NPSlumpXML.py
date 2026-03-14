@@ -279,3 +279,7 @@ tree.write(amPath + XM10MinFile, encoding="UTF-8")
 print(amPath + XM10MinFile + ",更新完成")
 tree.write(amhistPath + theTime + "_" + XM10MinFile, encoding="UTF-8")
 print(amhistPath + theTime + "_" + XM10MinFile + ",製作完成")
+
+# 新增轉檔完成Log
+log_obj.write_log_info(amPath + XM10MinFile + ",更新完成")
+log_obj.write_log_info(amhistPath + theTime + "_" + XM10MinFile + ",製作完成")
