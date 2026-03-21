@@ -47,6 +47,22 @@ pip freeze > requirements.txt
 
 #依照 requirements.txt 安裝類別庫
 pip install -r requirements.txt
+uv pip install -r requirements.txt
+
+venv 虛擬環境====================================================
+
+#進入虛擬環境
+.venv\Scripts\activate
+#離開虛擬環境
+deactivate
+#建立虛擬環境
+uv venv .venv --python 3.13
+#移除虛擬環境
+Remove-Item -Recurse -Force .venv
+
+uv 常用指令====================================================
+#使用uv 依照 requirements.txt 安裝類別庫
+uv pip install -r requirements.txt
 
 
 ================================================================
