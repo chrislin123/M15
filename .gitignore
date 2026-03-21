@@ -3,7 +3,7 @@ venv3114/
 XML/
 SystemRecord/
 .vscode/
-log/
+logs/
 # Pyarmor產生資料夾
 dist/
 .env

@@ -18,7 +18,7 @@ import ProjectLib as ProjectLib
 # Logger
 from logger import WriteLogTxt
 
-log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj = WriteLogTxt(r"\logs\XMLLog", "XMLLog", ProjectLib.getLoggerMailSetting())
 log_obj.setup_logger()
 
 # using now() to get current time
@@ -222,6 +222,7 @@ for node in root.iter("sensor"):
 
 # GPS更新10MinXML
 try:
+
     with dbinst.getsessionM15()() as session:
         maxdatetimestring = ""
         # 取得最新資料的日期
@@ -272,7 +273,10 @@ try:
 
 
 except Exception as e:
-    log_obj.write_log_exception("發生異常：{0}".format(e))
+    log_obj.write_log_exception(
+        f"異常內容：{e}",
+        f"發生異常: {type(e).__name__}",
+    )
 
 
 tree.write(amPath + XM10MinFile, encoding="UTF-8")

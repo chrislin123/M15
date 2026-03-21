@@ -61,9 +61,41 @@ uv venv .venv --python 3.13
 Remove-Item -Recurse -Force .venv
 
 uv 常用指令====================================================
+#目前專案使用的類別庫，產生requirements.txt
+uv pip freeze > requirements.txt
 #使用uv 依照 requirements.txt 安裝類別庫
 uv pip install -r requirements.txt
+#安裝元件
+uv pip install concurrent-log-handler
 
+
+pyarmor 常用指令====================================================
+#加密整個資料夾 (Recursive)
+pyarmor gen .
+
+#Pyarmor加密 跳過 dist 資料夾
+pyarmor gen --exclude dist --exclude .venv .
+
+#Pyarmor加密 跳過 dist,.venv 資料夾
+pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
+
+#直接進入虛擬環境並產生dist
+.\.venv\Scripts\activate;pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
+
+
+
+
+#加密整個資料夾 (Recursive)--包含搬移.env檔案
+todo
+
+
+
+#***重要***
+將機敏資料從 .env 移到 config.py 並使用 Pyarmor 加密的做法，是保護 API Key 和密碼的有效手段。
+因為 Pyarmor 會將 .py 檔案轉為不可讀的亂碼
+不要將 config.py 上傳到 GitHub：
+雖然 Pyarmor 混淆了代碼，但這是在「發布」給客戶或部署時用的。
+在開發階段，建議將 config.py 加入 .gitignore，或者另外留一份 config.example.py 範本（不含真實密碼）給團隊成員。
 
 ================================================================
 Python爬蟲常識
