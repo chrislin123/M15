@@ -76,6 +76,8 @@ pyarmor gen .
 #Pyarmor加密 跳過 dist 資料夾
 pyarmor gen --exclude dist --exclude .venv .
 
+
+
 #Pyarmor加密 跳過 dist,.venv 資料夾
 pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
 

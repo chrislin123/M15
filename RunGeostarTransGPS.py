@@ -313,7 +313,11 @@ def insResult10MinData(cond, station: GpsBasSetting):
                 session.commit()
 
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
+        print(f"An error occurred: {e}")
 
 
 def main():

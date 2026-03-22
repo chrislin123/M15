@@ -4,6 +4,7 @@ XML/
 SystemRecord/
 .vscode/
 logs/
+localdata/
 # Pyarmor產生資料夾
 dist/
 .env

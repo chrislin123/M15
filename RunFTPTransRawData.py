@@ -388,7 +388,11 @@ def TransToResult10MinData():
                         )
 
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
+        print(f"An error occurred: {e}")
 
 
 # 直接執行這個模組，它會判斷為 true
