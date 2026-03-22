@@ -79,6 +79,10 @@ pyarmor gen --exclude dist --exclude .venv .
 #Pyarmor加密 跳過 dist,.venv 資料夾
 pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
 
+#Pyarmor加密 先刪除dist，再跳過 dist,.venv 資料夾
+if (Test-Path ./dist) { Remove-Item -Recurse -Force ./dist }; pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
+
+
 #直接進入虛擬環境並產生dist
 .\.venv\Scripts\activate;pyarmor gen --recursive --exclude ./.venv --exclude ./dist .
 
