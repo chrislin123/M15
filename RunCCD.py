@@ -15,8 +15,8 @@ SourceBases = []
 SourceBases.append(
     {
         "url": r"http://111.70.17.18:89/%e4%b8%89%e5%9c%b0%e9%96%80/",
-        "filename": "DS004",
-        "foldername": "DS004",
+        "filename": "D089",
+        "foldername": "D089",
     }
 )
 
@@ -24,8 +24,8 @@ SourceBases.append(
 SourceBases.append(
     {
         "url": r"http://111.70.17.18:89/%e5%85%ad%e9%be%9c/",
-        "filename": "DS275",
-        "foldername": "DS275",
+        "filename": "D047",
+        "foldername": "D047",
     }
 )
 
@@ -33,8 +33,8 @@ SourceBases.append(
 SourceBases.append(
     {
         "url": r"http://111.70.17.18:89/%e8%8c%82%e6%9e%9701/",
-        "filename": "DS005",
-        "foldername": "DS005",
+        "filename": "D062",
+        "foldername": "D062",
     }
 )
 
@@ -42,8 +42,8 @@ SourceBases.append(
 SourceBases.append(
     {
         "url": r"http://111.70.17.18:89/%e8%8c%82%e6%9e%9702/",
-        "filename": "DS008",
-        "foldername": "DS008",
+        "filename": "D064",
+        "foldername": "D064",
     }
 )
 
