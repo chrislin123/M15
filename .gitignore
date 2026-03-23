@@ -3,6 +3,7 @@ venv3114/
 XML/
 SystemRecord/
 .vscode/
+.venv/
 logs/
 localdata/
 # Pyarmor產生資料夾
