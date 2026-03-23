@@ -18,7 +18,7 @@ import ProjectLib as ProjectLib
 # Logger
 from logger import WriteLogTxt
 
-log_obj = WriteLogTxt(r"\logs\XMLLog", "XMLLog", ProjectLib.getLoggerMailSetting())
+log_obj = WriteLogTxt(r"\logs\NPSlumpXML", "LogData", ProjectLib.getLoggerMailSetting())
 log_obj.setup_logger()
 
 # using now() to get current time

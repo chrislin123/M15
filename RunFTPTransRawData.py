@@ -15,7 +15,9 @@ import ProjectLib as ProjectLib
 # Logger
 from logger import WriteLogTxt
 
-log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj = WriteLogTxt(
+    r"\logs\RunFTPTransRawData", "LogData", ProjectLib.getLoggerMailSetting()
+)
 log_obj.setup_logger()
 
 
@@ -171,7 +173,10 @@ def DownloadToDB():
                         )
 
         except Exception as e:
-            log_obj.write_log_exception("發生異常：{0}".format(e))
+            log_obj.write_log_exception(
+                f"異常內容：{e}",
+                f"發生異常: {type(e).__name__}",
+            )
             continue
 
 
@@ -403,7 +408,10 @@ if __name__ == "__main__":
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         DownloadToDB()
     except Exception as e:
-        log_obj.write_log_exception(f"執行 DownloadToDB 發生異常：{e}")
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
 
     # 照理說要把轉檔XML改到另一隻程式
     # 轉檔至Result10MinData

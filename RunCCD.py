@@ -122,4 +122,7 @@ if __name__ == "__main__":
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         GetLatestCCD()
     except Exception as e:
-        log_obj.write_log_exception(f"執行 GetLatestCCD 發生異常：{e}")
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )

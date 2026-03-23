@@ -11,7 +11,9 @@ import ProjectLib as ProjectLib
 # Logger
 from logger import WriteLogTxt
 
-log_obj = WriteLogTxt(r"\log", "M15Log", ProjectLib.getLoggerMailSetting())
+log_obj = WriteLogTxt(
+    r"\logs\RunGeostarTransGPS", "LogData", ProjectLib.getLoggerMailSetting()
+)
 log_obj.setup_logger()
 
 
@@ -73,6 +75,8 @@ def getDailyCal(cond, station: GpsBasSetting):
             newlistDailyCal_N = listDailyCal_N[14:-14]
             newlistDailyCal_H = listDailyCal_H[14:-14]
             # 計算平均
+            # todo 如果前一天都沒資料，計算平均會出現錯誤，需要想辦法解決
+            # 如果給預設值，就要搭配後面轉檔判斷
             DailyCal_E = sum(newlistDailyCal_E) / len(newlistDailyCal_E)
             DailyCal_N = sum(newlistDailyCal_N) / len(newlistDailyCal_N)
             DailyCal_H = sum(newlistDailyCal_H) / len(newlistDailyCal_H)
@@ -83,7 +87,10 @@ def getDailyCal(cond, station: GpsBasSetting):
 
         return DailyCal
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
         return DailyCal
 
 
@@ -153,7 +160,10 @@ def getDisplacementTotal(cond, station: GpsBasSetting):
 
         return DisplacementTotal
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
         return DisplacementTotal
 
 
@@ -266,7 +276,10 @@ def CalGps(cond, station: GpsBasSetting):
 
         return geoResult
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
 
 
 def insResult10MinData(cond, station: GpsBasSetting):
@@ -354,7 +367,10 @@ def main():
             print(geoStations)
 
     except Exception as e:
-        log_obj.write_log_exception("發生異常：{0}".format(e))
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
 
     for station in geoStations:
         geoResult = ""
