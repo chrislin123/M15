@@ -16,10 +16,10 @@ from ProjectLib import getenv
 import ProjectLib as ProjectLib
 
 # Logger
-from logger import WriteLogTxt
+from logger import get_logger
 
-log_obj = WriteLogTxt(r"\logs\NPSlumpXML", "LogData", ProjectLib.getLoggerMailSetting())
-log_obj.setup_logger()
+log_obj = get_logger()
+
 
 # using now() to get current time
 now = datetime.now()

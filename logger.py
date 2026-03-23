@@ -1,5 +1,6 @@
 import logging.handlers
 import os
+import sys
 import logging
 from logging.handlers import SMTPHandler
 from datetime import datetime
@@ -133,6 +134,31 @@ class WriteLogTxt:
         error_detail = traceback.format_exc()
         full_msg = f"{custom_msg}\n詳細錯誤資訊：\n{error_detail}"
         self.logger.error(full_msg)
+
+
+def get_logger():
+    """
+    自動根據執行的檔案名稱建立 Logger 物件
+    """
+    try:
+        # 1. 取得當前執行腳本的檔名 (例如 RunGeostarTransGPS.py -> RunGeostarTransGPS)
+        script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+        # 2. 定義日誌路徑，使用 f-string 動態組合
+        log_path = rf"\logs\{script_name}"
+
+        # 3. 初始化 Logger 物件
+        # ProjectLib.getLoggerMailSetting() 會自動抓取郵件設定
+        log_obj = WriteLogTxt(log_path, "LogData", ProjectLib.getLoggerMailSetting())
+
+        # 4. 執行啟動設定
+        log_obj.setup_logger()
+
+        return log_obj
+
+    except Exception as e:
+        print(f"Logger 初始化失敗: {e}")
+        return None
 
 
 # --- 使用方法 ---

@@ -3,6 +3,12 @@ import os
 import xml.etree.ElementTree as XET
 from datetime import datetime, timedelta
 
+
+from logger import get_logger
+
+log_obj = get_logger()
+
+
 ############在這裡修改時間區段#######
 start_dt = datetime(2025, 5, 2, 8, 30, 0, 0)
 end_dt = datetime(2025, 5, 3, 0, 0, 0, 0)

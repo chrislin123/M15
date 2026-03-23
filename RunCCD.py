@@ -5,10 +5,9 @@ from urllib.parse import urljoin
 import ProjectLib as ProjectLib
 
 # Logger
-from logger import WriteLogTxt
+from logger import get_logger
 
-log_obj = WriteLogTxt(r"\logs\RunCCD", "LogData", ProjectLib.getLoggerMailSetting())
-log_obj.setup_logger()
+log_obj = get_logger()
 
 SourceBases = []
 # 三地門

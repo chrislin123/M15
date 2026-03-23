@@ -9,12 +9,9 @@ from db import dbinst, Result10MinData, GpsBasSetting
 import ProjectLib as ProjectLib
 
 # Logger
-from logger import WriteLogTxt
+from logger import get_logger
 
-log_obj = WriteLogTxt(
-    r"\logs\RunGeostarTransGPS", "LogData", ProjectLib.getLoggerMailSetting()
-)
-log_obj.setup_logger()
+log_obj = get_logger()
 
 
 # 每日解算(欄位8,9,10)
@@ -354,38 +351,28 @@ def main():
                 .all()
             )
 
-            # for data in datas:
-            #     Station = {
-            #         "Site": data.Site,
-            #         "Station": data.Station,
-            #         "Sensor": data.Sensor,
-            #         "TableTrans_MapName": data.TableTrans_MapName,
-            #     }
-            #     geoStations.append(Station)
-
-            # geoStations = [data for data in datas]
             print(geoStations)
+
+        for station in geoStations:
+            geoResult = ""
+            Cond = {"DatetimeQuery": datetimenow}
+
+            # 取得GNSS十個欄位計算結果
+            geoResult = CalGps(Cond, station)
+
+            Cond["geoResult"] = geoResult
+
+            # 寫入記錄檔
+            insResult10MinData(Cond, station)
+
+            print(
+                f"站點[{station.TableTrans_MapName}=>{station.Sensor}]-{datetimenow}-轉檔完成"
+            )
 
     except Exception as e:
         log_obj.write_log_exception(
             f"異常內容：{e}",
             f"發生異常: {type(e).__name__}",
-        )
-
-    for station in geoStations:
-        geoResult = ""
-        Cond = {"DatetimeQuery": datetimenow}
-
-        # 取得GNSS十個欄位計算結果
-        geoResult = CalGps(Cond, station)
-
-        Cond["geoResult"] = geoResult
-
-        # 寫入記錄檔
-        insResult10MinData(Cond, station)
-
-        print(
-            f"站點[{station.TableTrans_MapName}=>{station.Sensor}]-{datetimenow}-轉檔完成"
         )
 
 
