@@ -54,7 +54,7 @@ def GetLatestCCD():
         # 設定目標網址
         url = SourceBase["url"]
         # 設定存放資料夾
-        base_path = r"C:\FUNCTION\XML\vm"
+        base_path = r"C:\FUNCTION\XML_TN\dsmon\vm"
         save_folder = os.path.join(base_path, SourceBase["foldername"].strip("/"))
 
         # 如果資料夾不存在則建立
@@ -120,6 +120,8 @@ if __name__ == "__main__":
     # 下載資料同步到資料庫
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         GetLatestCCD()
+
+        log_obj.write_log_info("RunCCD,執行完成")
     except Exception as e:
         log_obj.write_log_exception(
             f"異常內容：{e}",

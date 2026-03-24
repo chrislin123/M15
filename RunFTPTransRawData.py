@@ -404,12 +404,14 @@ if __name__ == "__main__":
     # 下載資料同步到資料庫
     try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
         DownloadToDB()
+
+        # 照理說要把轉檔XML改到另一隻程式
+        # 轉檔至Result10MinData
+        TransToResult10MinData()
+
+        log_obj.write_log_info("RunFTPTransRawData,執行完成")
     except Exception as e:
         log_obj.write_log_exception(
             f"異常內容：{e}",
             f"發生異常: {type(e).__name__}",
         )
-
-    # 照理說要把轉檔XML改到另一隻程式
-    # 轉檔至Result10MinData
-    TransToResult10MinData()

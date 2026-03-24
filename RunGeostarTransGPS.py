@@ -380,4 +380,12 @@ def main():
 # 從另一個模組匯入這個模組，它會判斷為 false
 if __name__ == "__main__":
 
-    main()
+    try:  # 使用Try except，預防對方主機沒有連線導致下載程序異常影響後面轉檔
+        main()
+
+        log_obj.write_log_info("RunGeostarTransGPS,執行完成")
+    except Exception as e:
+        log_obj.write_log_exception(
+            f"異常內容：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
