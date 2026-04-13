@@ -5,6 +5,8 @@ from pprint import pprint
 
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # 資料庫連線相關及Orm.Model
 from sqlalchemy.sql import text
@@ -93,13 +95,39 @@ def DownloadToDB():
 
     for SourceBase in SourceBases:
         try:
+            df = None
             # 取得CSV檔案 by web
             url = SourceBase["url"]
-            s = requests.get(url).content
-            c = pd.read_csv(io.StringIO(s.decode(enc)), skiprows=header_row, dtype=str)
+
+            try:
+                # 20260413 新增重試及加大timeout時間
+                session = requests.Session()
+                # 定義重試規則：重試 3 次，每次間隔時間遞增
+                retries = Retry(
+                    total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504]
+                )
+                session.mount("http://", HTTPAdapter(max_retries=retries))
+                session.mount("https://", HTTPAdapter(max_retries=retries))
+
+                response = session.get(url, timeout=(5, 30))
+                # 檢查 HTTP 狀態
+                response.raise_for_status()
+
+                # 自動偵測編碼 (若 SourceBase 有提供特定編碼則強制指定)
+                response.encoding = enc if enc else response.apparent_encoding
+
+                # 取得內容並轉換為 DataFrame
+                s = response.text
+                df = pd.read_csv(io.StringIO(s), skiprows=header_row, dtype=str)
+
+            except Exception as e:
+                print(f"最終重試失敗：{e}")
+
+            # s = requests.get(url).content
+            # df = pd.read_csv(io.StringIO(s.decode(enc)), skiprows=header_row, dtype=str)
 
             SourceDatas = []
-            for index, row in c.iterrows():
+            for index, row in df.iterrows():
                 try:
                     Sourcedata = M15StationData()
                     Sourcedata.RawID = SourceBase["stationid"]

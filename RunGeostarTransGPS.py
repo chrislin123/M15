@@ -27,18 +27,37 @@ def getDailyCal(cond, station: GpsBasSetting):
         with dbinst.getsessionGeostar()() as session:
 
             params = {"DATETIME": DatetimeQuery}
+            # sql = text(
+            #     f"""
+            #         DECLARE @GivenDateTime DATETIME = :DATETIME;
+
+            #         SELECT sDateTime,
+            #                 x_E_Avg,
+            #                 y_N_Avg,
+            #                 z_H_Avg
+            #         FROM [{StationID}]
+
+            #         WHERE sDateTime >= DATEADD(day, -1, CAST(@GivenDateTime AS DATE))
+            #         AND sDateTime < CAST(@GivenDateTime AS DATE);
+
+            #     """
+            # )
+
+            # 20260410 因為資料有可能前一天都沒有，所以，調整找前一個有資料的日期，避免程式異常
+            # 這段子查詢會抓出「比指定日期小」的所有日期中，最大（最接近）的那一個
             sql = text(
                 f"""
                     DECLARE @GivenDateTime DATETIME = :DATETIME;
 
-                    SELECT sDateTime,
-                            x_E_Avg,
-                            y_N_Avg,
-                            z_H_Avg
+                    SELECT sDateTime, x_E_Avg, y_N_Avg, z_H_Avg
                     FROM [{StationID}]
-
-                    WHERE sDateTime >= DATEADD(day, -1, CAST(@GivenDateTime AS DATE))
-                    AND sDateTime < CAST(@GivenDateTime AS DATE);
+                    WHERE CAST(sDateTime AS DATE) = (
+                        
+                        SELECT MAX(CAST(sDateTime AS DATE))
+                        FROM [{StationID}]
+                        WHERE sDateTime < CAST(@GivenDateTime AS DATE)
+                    )
+                    ORDER BY sDateTime ASC;
 
                 """
             )
