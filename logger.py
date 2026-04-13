@@ -115,7 +115,8 @@ class WriteLogTxt:
             # 遍歷所有 Handler，找到 SMTPHandler 並修改其標題
             for handler in self.logger.handlers:
                 if isinstance(handler, SMTPHandler):
-                    handler.subject = f"[{ProjectLib.ProjectID} Error]({ProjectLib.ProjectName}){mail_subject}={datetime.now().strftime(
+                    hostname = os.environ.get("COMPUTERNAME", "Unknown-PC")
+                    handler.subject = f"[{ProjectLib.ProjectID} Error][{hostname}]({ProjectLib.ProjectName}){mail_subject}={datetime.now().strftime(
                         "%Y-%m-%dT%H:%M:%S"
                     )}"
 
@@ -127,7 +128,8 @@ class WriteLogTxt:
         if self.mail_config and mail_subject:
             for handler in self.logger.handlers:
                 if isinstance(handler, SMTPHandler):
-                    handler.subject = f"[{ProjectLib.ProjectID} Error]({ProjectLib.ProjectName}){mail_subject}={datetime.now().strftime(
+                    hostname = os.environ.get("COMPUTERNAME", "Unknown-PC")
+                    handler.subject = f"[{ProjectLib.ProjectID} Error][{hostname}]({ProjectLib.ProjectName}){mail_subject}={datetime.now().strftime(
                         "%Y-%m-%dT%H:%M:%S"
                     )}"
 
