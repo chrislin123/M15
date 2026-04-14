@@ -99,29 +99,57 @@ def DownloadToDB():
             # 取得CSV檔案 by web
             url = SourceBase["url"]
 
+            retries = Retry(
+                total=5,
+                read=5,  # 解決 Read timed out 的核心設定
+                connect=3,
+                backoff_factor=2,
+                status_forcelist=[500, 502, 503, 504],
+            )
+
+            session = requests.Session()
+            session.mount("http://", HTTPAdapter(max_retries=retries))
+            session.mount("https://", HTTPAdapter(max_retries=retries))
+
             try:
-                # 20260413 新增重試及加大timeout時間
-                session = requests.Session()
-                # 定義重試規則：重試 3 次，每次間隔時間遞增
-                retries = Retry(
-                    total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504]
-                )
-                session.mount("http://", HTTPAdapter(max_retries=retries))
-                session.mount("https://", HTTPAdapter(max_retries=retries))
-
-                response = session.get(url, timeout=(5, 30))
-                # 檢查 HTTP 狀態
+                # 2. 執行請求
+                # 增加 timeout 到 60 秒，給予設備充足的處理時間
+                response = session.get(url, timeout=(5, 60))
                 response.raise_for_status()
-
-                # 自動偵測編碼 (若 SourceBase 有提供特定編碼則強制指定)
+                # 3. 處理編碼與轉 Dataframe
                 response.encoding = enc if enc else response.apparent_encoding
 
-                # 取得內容並轉換為 DataFrame
-                s = response.text
-                df = pd.read_csv(io.StringIO(s), skiprows=header_row, dtype=str)
+                # 取得原始文字
+                full_text = response.text
+                all_lines = full_text.splitlines()
 
+                # --- 關鍵優化：只保留標題與最後 4320 筆 ---
+                # 根據你的設定 header_row = 16 (即跳過前 16 行，第 17 行作為標題)
+                if len(all_lines) > (header_row + 4320):
+                    # 取得標題列 (Index 16)
+                    header_line = all_lines[header_row]
+                    # 取得最後 4320 筆數據列
+                    last_data_lines = all_lines[-4320:]
+                    # 重新組合
+                    optimized_content = "\n".join([header_line] + last_data_lines)
+
+                    # 解析過濾後的資料 (不需要再 skiprows，因為我們已經手動處理了)
+                    df = pd.read_csv(io.StringIO(optimized_content), dtype=str)
+
+                else:
+                    # 檔案尚小時，照原邏輯讀取
+                    df = pd.read_csv(
+                        io.StringIO(full_text), skiprows=header_row, dtype=str
+                    )
+
+            except requests.exceptions.ReadTimeout:
+                # 如果重試 5 次（每次等 2~16 秒）都還失敗，才會跑到這裡
+                log_obj.write_log_error(
+                    f"最終重試 5 次後仍讀取超時: {url}",
+                    mail_subject="Tiltmeter嚴重超時",
+                )
             except Exception as e:
-                print(f"最終重試失敗：{e}")
+                log_obj.write_log_exception(f"發生未預期錯誤: {e}")
 
             # s = requests.get(url).content
             # df = pd.read_csv(io.StringIO(s.decode(enc)), skiprows=header_row, dtype=str)
