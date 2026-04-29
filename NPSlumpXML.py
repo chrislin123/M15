@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 # 資料庫連線相關及Orm.Model
 from sqlalchemy import select
 from sqlalchemy.sql import text
+from sqlalchemy.exc import IntegrityError
 
 # from sqlalchemy.orm import session
 from db import dbinst, Result10MinData
@@ -19,6 +20,106 @@ import ProjectLib as ProjectLib
 from logger import get_logger
 
 log_obj = get_logger()
+
+
+def import_xml_to_sql(file_path):
+    """
+    使用 SQLAlchemy Session 處理 XML 轉檔並寫入 Result10MinData 資料表
+    """
+    # 取得 Session 類別並建立實例 (with session 結束會自動關閉連線)
+    Session = dbinst.getsessionM15()
+
+    try:
+        with Session() as session:
+            # 解析 XML 檔案
+            tree = XET.parse(file_path)
+            root = tree.getroot()
+
+            count_inserted = 0
+            count_skipped = 0
+
+            # 遍歷 XML 結構 (site_data -> station -> sensor)
+            for site in root.findall(".//site_data"):
+                site_id = site.get("siteid")
+
+                for station in site.findall("station"):
+                    station_id = station.get("stationId")
+
+                    for sensor in station.findall("sensor"):
+                        sensor_id = sensor.get("sensorId")
+                        sensor_type = sensor.get("sensor_type")
+                        obs_num = sensor.get("observation_num")
+                        status = sensor.get("sensor_status")
+                        raw_time = sensor.get("time")
+                        sensor_value = sensor.text
+
+                        # --- 時間格式處理 ---
+                        try:
+                            # 1. 轉換為 datetime 物件
+                            dt_obj = datetime.strptime(raw_time, "%Y-%m-%d %H:%M:%S")
+
+                            # 取得時間，用XML檔案中的時間
+                            get_time = dt_obj.strftime("%Y-%m-%dT%H:%M:%S")
+
+                            # 強制將秒數設為 0
+                            dt_obj = dt_obj.replace(second=0)
+
+                            # 3. 產生對應字串
+                            dt_string = dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+
+                        except Exception:
+                            dt_obj = None
+                            dt_string = raw_time
+                            get_time = raw_time
+
+                        # --- 建立 ORM 物件 ---
+                        new_data = Result10MinData(
+                            SiteID=site_id,
+                            StationID=station_id,
+                            SensorID=sensor_id,
+                            DataType=sensor_type,
+                            DataName="",  # 依照要求設為空字串
+                            Datetime=dt_obj,  # 傳入 datetime 物件
+                            DatetimeString=dt_string,
+                            GetTime=get_time,
+                            observation_num=obs_num,
+                            sensor_status=status,
+                            value=sensor_value,
+                            # remark="XML回寫",
+                        )
+
+                        # --- 執行單筆寫入與 Commit ---
+                        try:
+                            session.add(new_data)
+                            session.commit()  # 每一筆成功就立刻存入資料庫
+                            count_inserted += 1
+                        except IntegrityError:
+                            # 發生重複 (Unique Index 衝突)
+                            session.rollback()  # 必須 rollback 以清除該次失敗的 Transaction 狀態
+                            count_skipped += 1
+                            continue
+                        except Exception as e:
+                            # 發生其他寫入錯誤
+                            session.rollback()
+                            print(f"感測器 {sensor_id} 寫入失敗: {e}")
+                            continue
+
+            log_obj.write_log_info(
+                amPath
+                + XM10MinFile
+                + f",檔案處理完成,成功新增: {count_inserted} 筆, 忽略重複: {count_skipped} 筆"
+            )
+            print(
+                amPath
+                + XM10MinFile
+                + f",檔案處理完成,成功新增: {count_inserted} 筆, 忽略重複: {count_skipped} 筆"
+            )
+
+    except Exception as e:
+        log_obj.write_log_exception(
+            f"處理檔案時發生非預期錯誤：{e}",
+            f"發生異常: {type(e).__name__}",
+        )
 
 
 # using now() to get current time
@@ -283,6 +384,15 @@ tree.write(amPath + XM10MinFile, encoding="UTF-8")
 print(amPath + XM10MinFile + ",更新完成")
 tree.write(amhistPath + theTime + "_" + XM10MinFile, encoding="UTF-8")
 print(amhistPath + theTime + "_" + XM10MinFile + ",製作完成")
+
+# 20260429 結果寫入資料庫
+# 檔案路徑
+full_xml_path = amPath + XM10MinFile
+# 呼叫 Function
+import_xml_to_sql(full_xml_path)
+
+# 關閉連線
+cnxn.close()
 
 # 新增轉檔完成Log
 log_obj.write_log_info(amPath + XM10MinFile + ",更新完成")
