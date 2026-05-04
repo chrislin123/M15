@@ -45,8 +45,7 @@ def getDailyCal(cond, station: GpsBasSetting):
 
             # 20260410 因為資料有可能前一天都沒有，所以，調整找前一個有資料的日期，避免程式異常
             # 這段子查詢會抓出「比指定日期小」的所有日期中，最大（最接近）的那一個
-            sql = text(
-                f"""
+            sql = text(f"""
                     DECLARE @GivenDateTime DATETIME = :DATETIME;
 
                     SELECT sDateTime, x_E_Avg, y_N_Avg, z_H_Avg
@@ -59,8 +58,7 @@ def getDailyCal(cond, station: GpsBasSetting):
                     )
                     ORDER BY sDateTime ASC;
 
-                """
-            )
+                """)
 
             result = session.execute(sql, params)
 
@@ -131,8 +129,7 @@ def getDisplacementTotal(cond, station: GpsBasSetting):
                 "DATETIME": DatetimeQuery.strftime("%Y-%m-%d %H:%M:%S"),
                 "MinDatetimeQuery": MinDatetimeQuery.strftime("%Y-%m-%d %H:%M:%S"),
             }
-            sql = text(
-                f"""
+            sql = text(f"""
                     DECLARE @GivenDateTime DATETIME = :DATETIME;
                     DECLARE @MinDatetimeQuery DATETIME = :MinDatetimeQuery;
 
@@ -161,8 +158,7 @@ def getDisplacementTotal(cond, station: GpsBasSetting):
                     FROM CurrentData c
                         CROSS JOIN FirstData p;
 
-                    """
-            )
+                    """)
 
             row = session.execute(sql, params).first()
 
@@ -200,8 +196,7 @@ def CalGps(cond, station: GpsBasSetting):
 
             # 取得結果
             params = {"DATETIME": cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}
-            sql = text(
-                f"""DECLARE @GivenDateTime DATETIME = :DATETIME;
+            sql = text(f"""DECLARE @GivenDateTime DATETIME = :DATETIME;
 
                     WITH CurrentData AS (
                         -- 選擇當前時間的記錄
@@ -256,8 +251,7 @@ def CalGps(cond, station: GpsBasSetting):
                         , (CAST( DEGREES(ATN2(Delta_E, Delta_N)) AS INT) +360  ) % 360  AS AzimuthAngle
                     FROM VectorData;
 
-                    """
-            )
+                    """)
 
             row = session.execute(sql, params).first()
 
@@ -329,7 +323,7 @@ def insResult10MinData(cond, station: GpsBasSetting):
                 Result10MinData1.observation_num = station.observation_num
                 Result10MinData1.sensor_status = "0"
                 Result10MinData1.value = geoResult
-                Result10MinData1.remark = f'設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
+                Result10MinData1.remark = f'[Geostar]設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
                 Result10MinData1.CgiData = ""
 
                 session.add(Result10MinData1)
@@ -338,7 +332,7 @@ def insResult10MinData(cond, station: GpsBasSetting):
                 # 更新資料
                 Result10MinData1.GetTime = ProjectLib.getNowDatetime()
                 Result10MinData1.value = geoResult
-                Result10MinData1.remark = f'設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
+                Result10MinData1.remark = f'[Geostar]設備編號：{station.TableTrans_MapName} 來源時間：{cond["RAWMaxDatetime"].strftime("%Y-%m-%d %H:%M:%S")}'
                 session.commit()
 
     except Exception as e:

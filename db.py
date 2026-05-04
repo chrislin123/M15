@@ -9,7 +9,17 @@ from urllib.parse import quote_plus
 # 資料庫相關sqlalchemy
 import sqlalchemy
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, Text, DateTime, DECIMAL
+from sqlalchemy import (
+    Table,
+    Column,
+    Integer,
+    String,
+    MetaData,
+    Text,
+    DateTime,
+    DECIMAL,
+    Numeric,
+)
 from sqlalchemy import select, insert
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from sqlalchemy.sql import text
@@ -133,6 +143,8 @@ class GpsBasSetting(Base):
     SensorType = Column(Text)
     SensorTypeSim = Column(Text)
     observation_num = Column(Text)
+    area = Column(Text)
+    source = Column(Text)
 
 
 class GeostarRaw(Base):
@@ -172,3 +184,61 @@ class M15StationData(Base):
     CH9 = Column(DECIMAL)
     CH10 = Column(DECIMAL)
     GetTime = Column(Text)
+
+
+# DB:Procal
+class StationReal(Base):
+    __tablename__ = "StationReal"
+    StationID = Column(String(8), primary_key=True, nullable=False)
+    MapCH = Column(Integer, primary_key=True, nullable=False)
+    Title = Column(Text)
+    Unit = Column(Text)
+    DataTime = Column(Text)
+    RealVale = Column(Text)
+    StationCH = Column(Text)
+    StationIDReal = Column(Text)
+    ParameterBP = Column(Text)
+    ParameterR = Column(Text)
+    ParameterC = Column(Text)
+    ParameterD = Column(Text)
+    ParameterL = Column(Text)
+    Alarm1 = Column(Text)
+    Alarm2 = Column(Text)
+    Alarm3 = Column(Text)
+    RealShow = Column(Text)
+    MaxValue = Column(Text)
+    MinValue = Column(Text)
+    Coefficient = Column(Text)
+    StationName = Column(Text)
+
+
+# DB:Procal
+class StationData(Base):
+    __tablename__ = "StationData"
+    StationID = Column(String(8), primary_key=True, nullable=False)
+    DataTime = Column(DateTime, primary_key=True, nullable=False)
+    FileName = Column(String(60))
+    CH1 = Column(Numeric(10, 3))
+    CH2 = Column(Numeric(10, 3))
+    CH3 = Column(Numeric(12, 5))  # 注意 CH3 的精度較大[cite: 1]
+    CH4 = Column(Numeric(10, 3))
+    CH5 = Column(Numeric(10, 3))
+    CH6 = Column(Numeric(10, 3))
+    CH7 = Column(Numeric(10, 3))
+    CH8 = Column(Numeric(10, 3))
+    CH9 = Column(Numeric(10, 3))
+    CH10 = Column(Numeric(10, 3))
+    CH11 = Column(Numeric(10, 3))
+    CH12 = Column(Numeric(10, 3))
+    CH13 = Column(Numeric(10, 3))
+    CH14 = Column(Numeric(10, 3))
+    CH15 = Column(Numeric(10, 3))
+    CH16 = Column(Numeric(10, 3))
+    CH17 = Column(Numeric(10, 3))
+    CH18 = Column(Numeric(10, 3))
+    CH19 = Column(Numeric(10, 3))
+    CH20 = Column(Numeric(10, 3))
+    CH21 = Column(Numeric(10, 3))
+    CH22 = Column(Numeric(10, 3))
+    CH23 = Column(Numeric(10, 3))
+    CH24 = Column(Numeric(10, 3))
