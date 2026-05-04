@@ -66,7 +66,7 @@ uv pip freeze > requirements.txt
 #使用uv 依照 requirements.txt 安裝類別庫
 uv pip install -r requirements.txt
 #安裝元件
-uv pip install concurrent-log-handler
+uv pip install lxml
 
 
 pyarmor 常用指令====================================================
